@@ -1,0 +1,14 @@
+body{
+    background-color: #F0EBFF;
+}
+
+h1{
+    text-align: center;
+    color: #400147;
+    padding: 3vh;
+}
+
+.btnprimary {
+    background-color: #2F1C4F;
+    color: white
+}

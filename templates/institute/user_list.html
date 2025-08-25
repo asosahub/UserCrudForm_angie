@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Usuarios{% endblock %}
+{% block content %}
+<h1>Usuarios</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Edad</th>
+            <th>Email</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.first_name }}</td>
+            <td>{{ user.last_name }}</td>
+            <td>{{ user.age }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+                <a href="{% url 'update_user' user.id %}" class="btn btn-primary btn-sm">Editar</a>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}">
+                    Eliminar
+                </button>
+            </td>
+        </tr>
+        <!-- Modal de confirmación para este usuario -->
+        <div class="modal fade" id="deleteModal{{ user.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ user.id }}" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel{{ user.id }}">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                ¿Estás seguro de que deseas eliminar al usuario <strong>{{ user.first_name }} {{ user.last_name }}</strong>?
+              </div>
+              <div class="modal-footer">
+                <form method="post" action="{% url 'delete_user' user.id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br/>
+<div class="d-grid gap-2 col-6  mx-auto">
+    <a href="{% url 'create_user' %}" class="btn btnprimary">Crear Usuario</a>
+</div>
+{% endblock %}
