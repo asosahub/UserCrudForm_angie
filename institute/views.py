@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from institute.forms.user_form import UserForm
-from institute.models import User
+from institute.forms.career_form import CareerForm
+from institute.forms.clubs_form import ClubsForm
+from institute.models import User, Career, Clubs
 
 def create_user(request):
     if request.method == 'POST':
@@ -43,3 +45,78 @@ def delete_user(request, user_id):
         user.delete()
         return redirect('user_list')
     return render(request, 'institute/confirm_delete.html', {'user': user})
+
+
+#Creacion de carrera
+def create_career(request):
+    if request.method == 'POST':
+        form = CareerForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return render(request, 'institute/success_career.html')
+    if request.method == 'GET':
+        form = CareerForm()
+        return render(request, 'institute/create_career.html', {'form': form})
+    return render(request, 'institute/create_career.html')
+
+#Creacion de clubes
+def create_club(request):
+    if request.method == 'POST':
+        form = ClubsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return render(request, 'institute/success_clubs.html')
+    if request.method == 'GET':
+        form = ClubsForm()
+        return render(request, 'institute/create_clubs.html', {'form': form})
+    return render(request, 'institute/create_clubs.html')
+
+#lista de carreras
+def career_list(request):
+    careers = Career.objects.all()
+    return render(request, 'institute/career_list.html', {'careers': careers})
+
+#lista de clubes
+def club_list(request):
+    clubs = Clubs.objects.all()
+    return render(request, 'institute/clubs_list.html', {'clubs': clubs})
+
+
+#eliminar carreras
+def delete_career(request, career_id):
+    career = get_object_or_404(Career, pk=career_id)
+    if request.method == 'POST':
+        career.delete()
+        return redirect('career_list')
+    return render(request, 'institute/confirm_delete_career.html', {'career': career})
+
+#eliminar clubes
+def delete_club(request, club_id):
+    club = get_object_or_404(Clubs, pk=club_id)
+    if request.method == 'POST':
+        club.delete()
+        return redirect('clubs_list')
+    return render(request, 'institute/confirm_delete_club.html', {'club': club})
+
+#actualizar carreras
+def update_carrer_modal(request, career_id):
+    career = get_object_or_404(Career, pk=career_id)
+
+    if request.method == 'POST':
+        form = CareerForm(request.POST, instance=career)
+        if form.is_valid():
+            form.save()
+            redirect('career_list')
+        return redirect('career_list')
+    
+
+#actualizar clubes
+def update_club_modal(request, club_id):
+    club = get_object_or_404(Clubs, pk=club_id)
+
+    if request.method == 'POST':
+        form = ClubsForm(request.POST, instance=club)
+        if form.is_valid():
+            form.save()
+            redirect('clubs_list')
+        return redirect('clubs_list')

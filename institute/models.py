@@ -7,13 +7,13 @@ from django.db import models
 #carreras del instituto
 class Career(models.Model):
     id = models.BigAutoField(primary_key=True)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
 
 #clubes del instituto
-class Club(models.Model):
+class Clubs(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=100)
 
@@ -27,7 +27,7 @@ class User(models.Model):
     age = models.IntegerField()
     email = models.EmailField(unique=True)
     career = models.ForeignKey(Career, on_delete=models.SET_NULL, null=True, blank=True) #si se elimina una carrera, no elimina el usuario
-    clubs = models.ManyToManyField(Club, blank=True)
+    clubs = models.ManyToManyField(Clubs, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     #muestra el nombre completo del usuario

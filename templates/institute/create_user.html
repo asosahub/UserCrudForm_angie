@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% block title %}Crear Usuario{% endblock %}
 {% block content %}
-<h1>Crear Usuario</h1>
+<h1>Crear Estudiante</h1>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <br/>
     <div class="d-grid gap-2 col-6 mx-auto">
         <button type="submit" class="btn btnprimary">Crear</button>
-        <a href="{% url 'user_list' %}" class="btn btn-outline-info" type="button">Volver a la lista de usuarios</a>
+        <a href="{% url 'user_list' %}" class="btn btn-secondary" type="button">Volver a la lista de estudiantes</a>
     </div>
 </form>
 {% endblock %}

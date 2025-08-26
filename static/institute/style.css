@@ -1,5 +1,10 @@
 body{
     background-color: #F0EBFF;
+    margin-bottom: 20px;
+}
+
+.navbar{
+    background-color: #2F1C4F;
 }
 
 h1{

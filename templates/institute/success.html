@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% block title %}Exito{% endblock %}
 {% block content %}
-<h1>Usuario creado exitosamente</h1>
+<h1>Estudiante creado exitosamente</h1>
 <br/>
 <div class="d-grid gap-2 col-6 mx-auto">
-    <a href="{% url 'create_user' %}" class="btn btnprimary">Crear otro usuario</a>
-    <a href="{% url 'user_list' %}" class="btn btn-outline-info">Volver a la lista de usuarios</a>
+    <a href="{% url 'create_user' %}" class="btn btnprimary">Crear otro estudiante</a>
+    <a href="{% url 'user_list' %}" class="btn btn-secondary">Volver a la lista de usuarios</a>
 </div>
 {% endblock %}

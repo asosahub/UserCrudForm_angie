@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Carreras{% endblock %}
+{% block content %}
+<h1>Carreras</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th class="col-md-8">Nombre</th>
+            <th class="col-md-4">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for career in careers %}
+        <tr>
+            <td>{{ career.name }}</td>
+            <td>
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editCareerModal{{ career.id }}">
+                    Editar
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCareerModal{{ career.id }}">
+                    Eliminar
+                </button>
+            </td>
+        </tr>
+        <!-- Modal de edición carrera -->
+         <div class="modal fade" id="editCareerModal{{ career.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Editar Carrera</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form id="editCareerForm{{ career.id }}" method="post" action="{% url 'update_career' career.id %}">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre de la carrera</label>
+                                    <input type="text" class="form-control" name="name" 
+                                           value="{{ career.name }}" required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Guardar</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+        <!-- Modal de confirmación eliminacion carrera -->
+        <div class="modal fade" id="deleteCareerModal{{ career.id }}" tabindex="-1" aria-labelledby="deleteCareerModalLabel{{ career.id }}" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="deleteCareerModalLabel{{ career.id }}">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                ¿Estás seguro de que deseas eliminar la carrera <strong>{{ career.name }}</strong>?
+                <br><small class="text-danger">Nota: Los estudiantes con esta carrera quedarán sin carrera asignada</small>
+              </div>
+              <div class="modal-footer">
+                <form method="post" action="{% url 'delete_career' career.id %}"> <!--ACA VA EL DELETE CAREER-->
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <tr>
+            <td colspan="3" class="text-center">No hay carreras registradas</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br/>
+{% endblock %}

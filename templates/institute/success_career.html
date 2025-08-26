@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Exito{% endblock %}
+{% block content %}
+<h1>Carrera creada exitosamente</h1>
+    <br/>
+<div class="d-grid gap-2 col-6 mx-auto">
+    <a href="{% url 'create_career' %}" class="btn btnprimary">Crear otra carrera</a>
+    <a href="{% url 'user_list' %}" class="btn btn-secondary">Volver</a>
+</div>
+{% endblock %}

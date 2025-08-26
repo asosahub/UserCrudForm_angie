@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Usuarios{% endblock %}
 {% block content %}
-<h1>Usuarios</h1>
+<h1>Estudiantes</h1>
 <table class="table table-striped">
     <thead>
         <tr>
@@ -9,6 +9,8 @@
             <th>Apellido</th>
             <th>Edad</th>
             <th>Email</th>
+            <th>Carrera</th>
+            <th>Clubes</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -19,6 +21,13 @@
             <td>{{ user.last_name }}</td>
             <td>{{ user.age }}</td>
             <td>{{ user.email }}</td>
+            <td>{{ user.career }}</td>
+            <td>
+                {% for club in user.clubs.all %}
+                    {{ club.name }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                    No pertenece a ningún club
+                {% endfor %}
             <td>
                 <a href="{% url 'update_user' user.id %}" class="btn btn-primary btn-sm">Editar</a>
                 <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}">
@@ -50,9 +59,5 @@
         {% endfor %}
     </tbody>
 </table>
-
 <br/>
-<div class="d-grid gap-2 col-6  mx-auto">
-    <a href="{% url 'create_user' %}" class="btn btnprimary">Crear Usuario</a>
-</div>
 {% endblock %}
