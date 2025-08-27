@@ -2,6 +2,13 @@
 {% block title %}Carreras{% endblock %}
 {% block content %}
 <h1>Carreras</h1>
+<!-- Botón para descargar reporte -->
+<div class="mb-3">
+    <a href="{% url 'career_users_report' %}" class="btn btnprimary">
+        Descargar Reporte Estudiantes por Carreras PDF
+    </a>
+</div>
+
 <table class="table table-striped">
     <thead>
         <tr>

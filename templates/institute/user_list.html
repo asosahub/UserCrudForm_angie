@@ -2,6 +2,13 @@
 {% block title %}Usuarios{% endblock %}
 {% block content %}
 <h1>Estudiantes</h1>
+<!-- Botón para descargar reporte -->
+<div class="mb-3">
+    <a href="{% url 'all_users_pdf_report' %}" class="btn btnprimary">
+        Descargar Reporte Estudiantes PDF
+    </a>
+</div>
+
 <table class="table table-striped">
     <thead>
         <tr>

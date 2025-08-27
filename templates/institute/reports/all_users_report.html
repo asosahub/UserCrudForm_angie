@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Todos los Usuarios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            font-size: 12px;
+        }
+        h1 {
+            text-align: center;
+            color: #400147;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+        .summary {
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            font-size: 11px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 10px;
+        }
+        th {
+            background-color: #2F1C4F;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: right;
+            font-size: 10px;
+            color: #7f8c8d;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: left;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+        td {
+            word-wrap: break-word;      /* Para navegadores y xhtml2pdf */
+            overflow-wrap: break-word;  /* Para navegadores modernos */
+            white-space: normal;        /* Permite saltos de línea */
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    <div class="subtitle">
+        Generado el: {{ generation_date }}
+    </div>
+
+    <div class="summary">
+        <strong>Resumen General:</strong><br>
+        • Total de estudiantes: {{ total_users }}<br>
+        • Estudiantes con carrera: {{ users_with_career }}<br>
+        • Estudiantes sin carrera: {{ users_without_career }}<br>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width:12%;">Nombre</th>
+                <th style="width:13%;">Apellido</th>
+                <th style="width:10%;">Edad</th>
+                <th style="width:23%;">Email</th>
+                <th style="width:18%;">Carrera</th>
+                <th style="width:15%;">Clubs</th>
+                <th style="width:14%;">Fecha Registro</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.last_name }}</td>
+                <td>{{ user.age }}</td>
+                <td>{{ user.email_wrapped }}</td>
+                <td>{{ user.career.name|default:"Sin carrera" }}</td>
+                <td>
+                    {% for club in user.clubs.all %}
+                    • {{ club.name }}<br>
+                    {% empty %}
+                    Ninguno
+                    {% endfor %}
+                </td>
+                <td>{{ user.created_at|date:"d/m/Y" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import create_user, update_user, user_list, delete_user, career_list, create_career, club_list, create_club, delete_career, delete_club, update_carrer_modal, update_club_modal
+from .reports import all_users_pdf_report, career_users_report
 
 urlpatterns = [
     path('', user_list, name='user_list'),
@@ -16,4 +17,8 @@ urlpatterns = [
     path('create_club/', create_club, name='create_club'),
     path('delete_club/<int:club_id>/', delete_club, name='delete_club'),
     path('update_club/<int:club_id>/', update_club_modal, name='update_club'),
+
+    path('reports/all_users_pdf/', all_users_pdf_report, name='all_users_pdf_report'),
+
+    path('reports/career_users_pdf/', career_users_report, name='career_users_report'),
 ]
