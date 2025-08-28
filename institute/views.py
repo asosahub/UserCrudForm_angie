@@ -3,6 +3,10 @@ from institute.forms.user_form import UserForm
 from institute.forms.career_form import CareerForm
 from institute.forms.clubs_form import ClubsForm
 from institute.models import User, Career, Clubs
+import requests
+from django.http import JsonResponse
+import json
+import random
 
 def create_user(request):
     if request.method == 'POST':
@@ -120,3 +124,38 @@ def update_club_modal(request, club_id):
             form.save()
             redirect('clubs_list')
         return redirect('clubs_list')
+    
+
+#CONSUMIR API PUBLICA (GENSHIN IMPACT)
+
+def genshin_api_view(request):
+    try:
+        
+        url = "https://genshin.jmp.blue/characters"
+        response = requests.get(url)
+        response.raise_for_status()
+        characters = response.json()
+
+        # PERSONAJE RANDOM
+        random_character_name = random.choice(characters) if characters else None
+        random_character_details = None
+        
+        if random_character_name:
+            char_url = f"https://genshin.jmp.blue/characters/{random_character_name}"
+            char_response = requests.get(char_url)
+            random_character_details = char_response.json()
+
+        context = {
+            'characters': characters,
+            'total_characters': len(characters),
+            'first_character': random_character_details,
+            'first_character_name': random_character_name,
+            'api_url': url
+        }
+
+        return render(request, 'institute/genshin_api.html', context)
+    
+    except Exception as e:
+        return render(request, 'institute/genshin_api.html', {
+            'error': f"Error: {str(e)}"
+        })

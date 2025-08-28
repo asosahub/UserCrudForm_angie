@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}API Genshin Impact{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h1>Consumiendo API de Genshin Impact</h1>
+
+    {% if error %}
+        <div class="alert alert-danger">
+            <strong>Error:</strong> {{ error }}
+        </div>
+    {% else %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Información de la API</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>URL consumida:</strong> {{ api_url }}</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Lista de personajes -->
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Lista de personajes ({{ total_characters }})</h5>
+                    </div>
+                    <div class="card-body overflow-auto cardchar">
+                        <div class="row">
+                            {% for character_name in characters %}
+                            <div class="col-md-6 mb-2">
+                                <span class="badge bg-success">{{ character_name }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detalles del personaje -->
+            <div class="col-md-7">
+                {% if first_character %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Detalles de: {{ first_character_name|title }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <img src="https://genshin.jmp.blue/characters/{{ first_character_name }}/icon"
+                                    alt="{{ first_character_name }}"
+                                    width="120"
+                                    class="img-thumbnail mb-3">
+                                <br>
+                                <small class="text-muted">Icono del personaje</small>
+                            </div>
+                            <div class="col-md-8">
+                                <h6>Información básica</h6>
+                                <p><strong>Nombre:</strong> {{ first_character_name|title }}</p>
+
+                                {% if first_character.title %}
+                                <p><strong>Título:</strong> {{ first_character.title }}</p>
+                                {% endif %}
+
+                                {% if first_character.vision %}
+                                <p><strong>Elemento:</strong>
+                                    <span class="badge bg-info">{{ first_character.vision }}</span>
+                                </p>
+                                {% endif %}
+
+                                {% if first_character.weapon %}
+                                <p><strong>Arma:</strong>
+                                    <span class="badge bg-warning text-dark">{{ first_character.weapon }}</span>
+                                </p>
+                                {% endif %}
+
+                                {% if first_character.nation %}
+                                <p><strong>Nación:</strong>
+                                    <span class="badge bg-success">{{ first_character.nation }}</span>
+                                </p>
+                                {% endif %}
+
+                                {% if first_character.rarity %}
+                                <p><strong>Rareza:</strong> 
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter0 < first_character.rarity %}★{% endif %}
+                                    {% endfor %}
+                                </p>
+                                {% endif %}
+                                
+                                {% if first_character.description %}
+                                <p><strong>Descripción:</strong><br>
+                                    <small>{{ first_character.description|truncatewords:30 }}</small>
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

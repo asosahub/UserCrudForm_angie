@@ -9,6 +9,10 @@ from io import BytesIO
 from django.db.models import Count, Avg
 from .models import User, Career
 from django.utils import timezone
+from reportlab.pdfgen import canvas
+from .pdf_signer import sign_pdf_with_p12
+import os
+from django.conf import settings
 
 #REPORTE CON XHTML2PDF - REPORTE DE TODOS LOS USUARIOS
 
@@ -40,19 +44,46 @@ def all_users_pdf_report(request):
 
         #Convierte el template html en string
         html_string = render_to_string('institute/reports/all_users_report.html', context)
-        
-        #Crea la respuesta http como pdf adjunto
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="reporte_general_estudiantes.pdf"'
-        
-        #general el pdf, convierte el html a pdf y lo guarda en response
-        pisa_status = pisa.CreatePDF(html_string, dest=response, encoding='UTF-8')
-        
-        #verifica errores
+
+        #genera el pdf en memoria
+        pdf_buffer = BytesIO()
+        pisa_status = pisa.CreatePDF(html_string, dest=pdf_buffer, encoding='UTF-8')
+
         if pisa_status.err:
-            return HttpResponse('Error al generar el PDF. Revisa consola para detalles.')
+            return HttpResponse('Error al generar el PDF')
+
+        #FIRMAR PDF
+        pdf_bytes = pdf_buffer.getvalue()
+        pkcs12_path = os.path.join(settings.BASE_DIR, "certs", "my_certificate.p12")
+
+        sign_document = True  # Cambia a False si no quieres firmar
+
+        if sign_document:
+            print("[reports.all_users_pdf_report] Intentando firmar el PDF...")
+            try:
+                signed_pdf = sign_pdf_with_p12(
+                    pdf_bytes,
+                    pkcs12_path=pkcs12_path,
+                    password="",
+                    reason="Reporte general firmado",
+                    location="Instituto"
+                )
+                print(f"[reports.all_users_pdf_report] Resultado firma: {len(signed_pdf)} bytes")
+                if len(signed_pdf) > len(pdf_bytes):
+                    print("[reports.all_users_pdf_report] Firma aplicada. Reemplazando contenido.")
+                    pdf_bytes = signed_pdf
+                else:
+                    print("[reports.all_users_pdf_report] Tamaño no cambió o firma no aplicada. Se usa PDF original.")
+            except Exception as e:
+                print(f"[reports.all_users_pdf_report] Error al firmar: {e}")
+                import traceback; traceback.print_exc()
+                print("[reports.all_users_pdf_report] Se devuelve el PDF original sin firmar.")
         
-        #devuelve el pdf como response
+        #devolver el pdf firmado
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename="reporte_general_estudiantes.pdf"'
+        response.write(pdf_bytes)
+
         return response
         
     except Exception as e:
@@ -224,17 +255,37 @@ def career_users_report(request):
         # Construye el PDF
         doc.build(elements)
 
-        #crea respuesta http que contenddra un pdf
-        response = HttpResponse(content_type='application/pdf')
-
-        #lo descarga como archivo e indica el nombre del pdf
-        response['Content-Disposition'] = 'attachment; filename="reporte_estudiantes_por_carrera.pdf"'
-
-        #obtiene el contenido de buffer como bytes y response.write escribe esos bytes en la respuesta http
-        response.write(buffer.getvalue())
-        #cierra el buffer para liberar memoria
+        #FIRMA PDF
+        pdf_bytes = buffer.getvalue()
+        pkcs12_path = os.path.join(settings.BASE_DIR, "certs", "my_certificate.p12")
         buffer.close()
 
+        sign_document = True  # Cambia a False si no quieres firmar
+
+        if sign_document:
+            print("[reports.career_users_report] Intentando firmar el PDF...")
+            try:
+                signed_pdf = sign_pdf_with_p12(
+                    pdf_bytes,
+                    pkcs12_path=pkcs12_path,
+                    password="",
+                    reason="Reporte por carrera firmado",
+                    location="Instituto"
+                )
+                print(f"[reports.career_users_report] Resultado firma: {len(signed_pdf)} bytes")
+                if len(signed_pdf) > len(pdf_bytes):
+                    print("[reports.career_users_report] Firma aplicada. Reemplazando contenido.")
+                    pdf_bytes = signed_pdf
+                else:
+                    print("[reports.career_users_report] Tamaño no cambió o firma no aplicada. Se usa PDF original.")
+            except Exception as e:
+                print(f"[reports.career_users_report] Error al firmar: {e}")
+                import traceback; traceback.print_exc()
+                print("[reports.career_users_report] Se devuelve el PDF original sin firmar.")
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename="reporte_estudiantes_por_carrera.pdf"'
+        response.write(pdf_bytes)
         return response
     
     except Exception as e:
