@@ -2,48 +2,69 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <title>{% block title %}Instituto{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <title>{% block title %}Panel{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'institute/style.css' %}">
 </head>
 <body>
-    <!--Navbar-->
-    <nav class="navbar navbar-expand-lg border-bottom border-body" data-bs-theme="dark">
+    <!-- Navbar dinámica -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'user_list' %}">Instituto</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+            <a class="navbar-brand" href="#">Instituto</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText"
+                aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                <a class="nav-link" href="{% url 'user_list' %}">Estudiantes</a>
-                </li>
-                <li class="nav-item">
-                <a class="nav-link" href="{% url 'career_list' %}">Carreras</a>
-                </li>
-                <li class="nav-item">
-                <a class="nav-link" href="{% url 'clubs_list' %}">Clubs</a>
-                </li>
-                <li class="nav-item">
-                <a class="nav-link" href="{% url 'genshin_api' %}">
-                    API Genshin
-                </a>
-                </li>
-            </ul>
 
-            <div class="navbar-nav ms-auto">
-                <a href="{% url 'create_user' %}" class="btn btn-outline-light btn-sm me-2">+ Usuario</a>
-                <a href="{% url 'create_career' %}" class="btn btn-outline-light btn-sm me-2">+ Carrera</a>
-                <a href="{% url 'create_club' %}" class="btn btn-outline-light btn-sm">+ Club</a>
-            </div>
+            <div class="collapse navbar-collapse" id="navbarText">
+                <!-- Grupo izquierdo -->
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <span class="nav-link disabled">Bienvenido, {{ user.first_name }} ({{ user.rol }})!</span>
+                        </li>
+                        {% if user.rol.rol == 'Administrador' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'user_list' %}">Usuarios</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'career_list' %}">Carreras</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'clubs_list' %}">Clubes</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'genshin_api' %}">API genshin</a>
+                            </li>
+                        {% elif user.rol.rol == 'Estudiante' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'genshin_api' %}">API genshin</a>
+                            </li>
+                        {% elif user.rol.rol == 'Invitado' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'genshin_api' %}">API genshin</a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
 
+                <!-- Grupo derecho -->
+                <div class="d-flex align-items-center">
+                    {% if user.is_authenticated and user.rol.rol == 'Administrador' %}
+                        <a href="{% url 'create_user' %}" class="btn btn-outline-light btn-sm me-2">+ Usuario</a>
+                        <a href="{% url 'create_career' %}" class="btn btn-outline-light btn-sm me-2">+ Carrera</a>
+                        <a href="{% url 'create_club' %}" class="btn btn-outline-light btn-sm me-4">+ Club</a>
+                    {% endif %}
+                    <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">Salir</a>
+                </div>
             </div>
         </div>
     </nav>
-    <!--Fin Navbar-->
+
     <div class="container mt-4">
-        {% block content %}{% endblock %}
+        {% block content %}
+        {% endblock %}
     </div>
 </body>
 </html>

@@ -2,17 +2,96 @@ from django.shortcuts import render, get_object_or_404, redirect
 from institute.forms.user_form import UserForm
 from institute.forms.career_form import CareerForm
 from institute.forms.clubs_form import ClubsForm
+from institute.forms.login_form import UserLoginForm
+from django.contrib.auth import login as auth_login, logout as auth_logout
+from django.contrib.auth.decorators import login_required, user_passes_test
 from institute.models import User, Career, Clubs
 import requests
-from django.http import JsonResponse
-import json
 import random
+
+
+#LOGIN
+def login(request):
+    if request.method == 'POST':
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+
+            try:
+                user = User.objects.get(email=email)
+                if user.check_password(password):
+                    auth_login(request, user, backend='institute.backends.UserBackend')
+                    return redirect ('dashboard')
+                else:
+                    form.add_error('password', 'Credenciales invalidas')
+            except User.DoesNotExist:
+                form.add_error('email', 'Usuario no encontrado')
+    else:
+        form = UserLoginForm()
+
+    return render(request, 'login/login.html', {'form': form})
+
+def logout(request):
+    auth_logout(request)
+    return redirect('login')
+
+
+def check_rol_admin(user):
+    return user.is_authenticated and user.rol.rol == 'Administrador'
+
+def check_rol_estudiante(user):
+    return user.is_authenticated and user.rol.rol == 'Estudiante'
+
+def check_rol_invitado(user):
+    return user.is_authenticated and user.rol.rol == 'Invitado'
+
+
+#Redirige al dashboard segun el rol
+@login_required
+def dashboard(request):
+    user = request.user
+
+    if user.rol.rol == 'Administrador':
+        return redirect('dashboard_admin')
+    elif user.rol.rol == 'Estudiante':
+        return redirect('dashboard_estudiante')
+    elif user.rol.rol == 'Invitado':
+        return redirect('dashboard_invitado')
+    else:
+        #rol no reconocido y redirige a login
+        auth_login(request)
+        return redirect('login')
+    
+
+#dashboards especificos por rol
+@login_required
+@user_passes_test(check_rol_admin)
+def dashboard_admin(request):
+    return render(request, 'dashboard/admin.html', {'user': request.user})
+
+@login_required
+@user_passes_test(check_rol_estudiante)
+def dashboard_estudiante(request):
+    return render(request, 'dashboard/estudiante.html', {'user': request.user})
+
+@login_required
+@user_passes_test(check_rol_invitado)
+def dashboard_invitado(request):
+    return render(request, 'dashboard/invitado.html', {'user': request.user})
+
+
+
+
 
 def create_user(request):
     if request.method == 'POST':
         form = UserForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save(commit=False) #no guarda todavia
+            user.set_password(form.cleaned_data['password']) #encripta
+            user.save()
+            form.save_m2m() #guarda relaciones m2m (clubs)
             return render(request, 'institute/success.html')
     if request.method == 'GET':
         form = UserForm()
@@ -21,23 +100,27 @@ def create_user(request):
 
 
 def update_user(request, user_id):
-    #busca el usurio por id, devuelve un 404 si no lo encuentra
     user = get_object_or_404(User, pk=user_id)
 
     if request.method == 'POST':
-        user = get_object_or_404(User, pk=user_id)
-
-        #crea el formulario con los datos del usuario
         form = UserForm(request.POST, instance=user)
         if form.is_valid():
-            form.save()
-            #muestra html de exito
-            return render (request, 'institute/success_update.html', {'user': user})
+            updated_user = form.save(commit=False)
+            password = form.cleaned_data.get('password')
+            if password:  # solo actualiza si se escribió algo
+                updated_user.set_password(password)
+            else:
+                # Mantener la contraseña actual si el campo está vacío
+                updated_user.password = user.password
+            updated_user.save()
+            form.save_m2m()
+            return render(request, 'institute/success_update.html', {'updated_user': updated_user})
     else:
-        #si es un GET, muestra el formulario con los datos del usuario
         form = UserForm(instance=user)
-    #renderiza el formulario con los datos del usuario
+
     return render(request, 'institute/update_user.html', {'form': form, 'user': user})
+
+
 
 def user_list(request):
     users = User.objects.all()
@@ -126,6 +209,9 @@ def update_club_modal(request, club_id):
         return redirect('clubs_list')
     
 
+
+
+
 #CONSUMIR API PUBLICA (GENSHIN IMPACT)
 
 def genshin_api_view(request):
@@ -159,3 +245,4 @@ def genshin_api_view(request):
         return render(request, 'institute/genshin_api.html', {
             'error': f"Error: {str(e)}"
         })
+    

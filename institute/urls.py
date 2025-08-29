@@ -1,9 +1,17 @@
 from django.urls import path
-from .views import create_user, update_user, user_list, delete_user, career_list, create_career, club_list, create_club, delete_career, delete_club, update_carrer_modal, update_club_modal, genshin_api_view
+from .views import login, logout, dashboard, dashboard_admin, dashboard_estudiante, dashboard_invitado, create_user, update_user, user_list, delete_user, career_list, create_career, club_list, create_club, delete_career, delete_club, update_carrer_modal, update_club_modal, genshin_api_view
 from .reports import all_users_pdf_report, career_users_report
 
 urlpatterns = [
-    path('', user_list, name='user_list'),
+    path('login/', login, name='login'),
+    path('logout/', logout, name='logout'),
+    path('dashboard/', dashboard, name='dashboard'),
+    path('dashboard/admin', dashboard_admin, name='dashboard_admin'),
+    path('dashboard/estudiante', dashboard_estudiante, name='dashboard_estudiante'),
+    path('dashboard/invitado', dashboard_invitado, name='dashboard_invitado'),
+
+    path('', login, name='login'),
+    path('user_list', user_list, name='user_list'),
     path('create/', create_user, name='create_user'),
     path('update_user/<int:user_id>/', update_user, name='update_user'),
     path('user/<int:user_id>/delete/', delete_user, name='delete_user'),

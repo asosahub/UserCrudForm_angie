@@ -53,6 +53,13 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'UserCrudForm.urls'
 
+AUTHENTICATION_BACKENDS = [
+    'institute.backends.UserBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AUTH_USER_MODEL = 'institute.User'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -81,6 +88,11 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# Usar email como campo de login
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/login/'
 
 
 # Password validation

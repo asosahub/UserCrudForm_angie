@@ -4,6 +4,7 @@
 <h1>Usuario Actualizado exitosamente</h1>
     <br/>
 <div class="d-grid gap-2 col-6 mx-auto">
+    <p>Se actualizó el usuario: {{ updated_user.first_name }}</p>
     <a href="{% url 'user_list' %}" class="btn btnprimary">Volver</a>
 </div>
 {% endblock %}

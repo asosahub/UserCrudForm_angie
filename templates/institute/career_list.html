@@ -5,7 +5,7 @@
 <!-- Botón para descargar reporte -->
 <div class="mb-3">
     <a href="{% url 'career_users_report' %}" class="btn btnprimary">
-        Descargar Reporte Estudiantes por Carreras PDF
+        Descargar Reporte Usuarios por Carreras PDF
     </a>
 </div>
 
@@ -66,7 +66,7 @@
               </div>
               <div class="modal-body">
                 ¿Estás seguro de que deseas eliminar la carrera <strong>{{ career.name }}</strong>?
-                <br><small class="text-danger">Nota: Los estudiantes con esta carrera quedarán sin carrera asignada</small>
+                <br><small class="text-danger">Nota: Los usuarios con esta carrera quedarán sin carrera asignada</small>
               </div>
               <div class="modal-footer">
                 <form method="post" action="{% url 'delete_career' career.id %}"> <!--ACA VA EL DELETE CAREER-->

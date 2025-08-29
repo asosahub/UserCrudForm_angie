@@ -35,7 +35,7 @@ def all_users_pdf_report(request):
         # Contexto para usar en html
         context = {
             'users': users,
-            'title': 'Reporte general de estudiantes',
+            'title': 'Reporte general de usuarios',
             'generation_date': timezone.now().strftime('%d/%m/%Y'),
             'total_users': users.count(),
             'users_with_career': users.filter(career__isnull=False).count(),
@@ -81,7 +81,7 @@ def all_users_pdf_report(request):
         
         #devolver el pdf firmado
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'inline; filename="reporte_general_estudiantes.pdf"'
+        response['Content-Disposition'] = 'inline; filename="reporte_general_usuarios.pdf"'
         response.write(pdf_bytes)
 
         return response
@@ -91,7 +91,7 @@ def all_users_pdf_report(request):
 
 
 
-#REPORTE CON REPORTLAB - REPORTE DE ESTUDIANTES POR CARRERA
+#REPORTE CON REPORTLAB - REPORTE DE USUARIOS POR CARRERA
 
 def career_users_report(request):
     try:
@@ -124,7 +124,7 @@ def career_users_report(request):
         )
 
         #titulo de reporte
-        elements.append(Paragraph('Reporte para estudiantes por carrera', title_style))
+        elements.append(Paragraph('Reporte para usuarios por carrera', title_style))
         elements.append(Paragraph(f'Generado el: {timezone.now().strftime("%d/%m/%Y")}', styles['Normal']))
         elements.append(Spacer(1, 20))
 
@@ -134,9 +134,9 @@ def career_users_report(request):
         users_without_career = User.objects.filter(career__isnull=True).count()
 
         summary_data = [
-            ['Total de estudiantes', str(total_users)],
-            ['Estudiantes con carrera asignada', str(users_with_career)],
-            ['Estudiantes sin carrera asignada', str(users_without_career)]
+            ['Total de usuarios', str(total_users)],
+            ['Usuarios con carrera asignada', str(users_with_career)],
+            ['Usuarios sin carrera asignada', str(users_without_career)]
         ]
 
         #crea una tabla para el resumen
@@ -175,7 +175,7 @@ def career_users_report(request):
             )
 
             avg_age = stats['avg_age'] or 0 # Manejo de None, si es None, asigna 0
-            stats_text = f"Total de estudiantes: {stats['total']} | Edad promedio: {avg_age:.1f} años"
+            stats_text = f"Total de usuarios: {stats['total']} | Edad promedio: {avg_age:.1f} años"
 
             #agrega las estadisticas al documento
             elements.append(Paragraph(stats_text, styles['Normal']))
@@ -213,16 +213,16 @@ def career_users_report(request):
             elements.append(table)
             elements.append(Spacer(1, 20))
 
-        #Estudiantes sin carrera
+        #usuarios sin carrera
         users_no_career = User.objects.filter(career__isnull=True).select_related('career').prefetch_related('clubs')
         if users_no_career.exists():
-            #encabezado para estudiantes sin carrera
-            elements.append(Paragraph('Estudiantes sin carrera asignada', header_style))
+            #encabezado para usuarios sin carrera
+            elements.append(Paragraph('Usuarios sin carrera asignada', header_style))
             elements.append(Spacer(1, 10))
 
             no_career_data = [['Nombre', 'Apellido', 'Edad', 'Email', 'Clubes']]
 
-            #llenar datos de estudiantes sin carrera
+            #llenar datos de usuarios sin carrera
             for i, user in enumerate(users_no_career, 1):
                 no_career_data.append([
                     user.first_name,
@@ -232,7 +232,7 @@ def career_users_report(request):
                     , ', '.join([club.name for club in user.clubs.all()]) or 'Sin clubes'
                 ])
             
-            #crear tabla para estudiantes sin carrera
+            #crear tabla para usuarios sin carrera
             table = Table(no_career_data, colWidths=[80, 80, 40, 150])
             table.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2F1C4F')),
@@ -249,7 +249,7 @@ def career_users_report(request):
             elements.append(table)
         
         #GENERAR PDF
-        doc.title = "Reporte de Estudiantes por Carrera"
+        doc.title = "Reporte de Usuarios por Carrera"
         doc.author = "Instituto"
 
         # Construye el PDF
@@ -284,7 +284,7 @@ def career_users_report(request):
                 print("[reports.career_users_report] Se devuelve el PDF original sin firmar.")
 
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'inline; filename="reporte_estudiantes_por_carrera.pdf"'
+        response['Content-Disposition'] = 'inline; filename="reporte_usuarios_por_carrera.pdf"'
         response.write(pdf_bytes)
         return response
     

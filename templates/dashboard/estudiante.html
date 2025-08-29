@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Panel Estudiante{% endblock %}
+
+{% block content %}
+    <h1>Panel del Estudiante</h1>
+
+      <div class="row mt-3">
+    <!-- Card de carrera -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          Mi Carrera
+        </div>
+        <div class="card-body">
+          {% if user.career %}
+            <h5 class="card-title">{{ user.career }}</h5>
+            <p class="card-text">Esta es tu carrera actual.</p>
+          {% else %}
+            <p class="card-text text-muted">Aún no tienes una carrera asignada.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Card de clubes -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          Mis Clubes
+        </div>
+        <div class="card-body">
+          {% if user.clubs.all %}
+            <ul class="list-group">
+              {% for club in user.clubs.all %}
+                    {{ club.name }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                    No pertenece a ningún club
+                {% endfor %}
+            </ul>
+          {% else %}
+            <p class="card-text text-muted">No perteneces a ningún club.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
