@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import login, logout, dashboard, dashboard_admin, dashboard_estudiante, dashboard_invitado, create_user, update_user, user_list, delete_user, career_list, create_career, club_list, create_club, delete_career, delete_club, update_carrer_modal, update_club_modal, genshin_api_view
+from .views import login, logout, dashboard, dashboard_admin, dashboard_estudiante, dashboard_invitado, create_user, update_user, user_list, delete_user, career_list, create_career, club_list, create_club, delete_career, delete_club, update_carrer_modal, update_club_modal, genshin_api_view, api_update_user, api_create_career
 from .reports import all_users_pdf_report, career_users_report
 
 urlpatterns = [
@@ -30,5 +30,8 @@ urlpatterns = [
 
     path('reports/career_users_pdf/', career_users_report, name='career_users_report'),
 
-    path('genshin/', genshin_api_view, name="genshin_api")
+    path('genshin/', genshin_api_view, name="genshin_api"),
+
+    path('api/update_user/<int:user_id>/', api_update_user, name='api_update_user'),
+    path('api/create_career', api_create_career, name='api_create_career')
 ]

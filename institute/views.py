@@ -8,6 +8,9 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from institute.models import User, Career, Clubs
 import requests
 import random
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .serializers import UserSerializer, CareerSerializer
 
 
 #LOGIN
@@ -119,6 +122,32 @@ def update_user(request, user_id):
         form = UserForm(instance=user)
 
     return render(request, 'institute/update_user.html', {'form': form, 'user': user})
+
+#ENDPOINT PARA USOS DE SERIALIZER
+
+#actualizar usuario
+@api_view(['PUT'])
+def api_update_user(request, user_id):
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=404)
+    
+    serializer = UserSerializer(user, data=request.data)
+    #realiza validacion
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=200)
+    return Response(serializer.errors, status=400)
+
+#crear carrera
+@api_view(['POST'])
+def api_create_career(request):
+    serializer = CareerSerializer(data=request.data)
+    if serializer.is_valid():
+        career = serializer.save() #guarda en la bd
+        return Response (CareerSerializer(career).data, status=201)
+    return Response(serializer.errors, status=400)
 
 
 
